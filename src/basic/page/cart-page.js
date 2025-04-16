@@ -1,5 +1,5 @@
-import CartSection from "./cart-section"
-import ProductSection from "./product-section"
+import CartSection from "../components/cart-section"
+import ProductSection from "../components/product-section"
 
 export default function CartPage() {
     return /* HTML */ `<div class="bg-gray-100 p-8">
