@@ -1,17 +1,13 @@
 import MOCK_PRODUCT_LIST from '../mock/product';
 
-/**
- * - 장바구니에 담긴 상품들의 총 가격을 화면에 반영합니다.
- * - 총 가격에 대한 보너스 포인트 함수를 호출합니다.
- * */
+/** 장바구니에 담긴 상품들의 계산 정보(totalPricce, totalItemCount, subTotalPrice)를 반환합니다. */
 export const calculateCart = () => {
-    const sum = document.getElementById('cart-total');
-    const cartContainer = document.getElementById('cart-items');
+    const $cartContainer = document.getElementById('cart-items');
 
     let totalPrice = 0;
     let totalItemCount = 0;
 
-    const cartItems = cartContainer.children;
+    const cartItems = $cartContainer.children;
     let subTotalPrice = 0;
 
     for (let i = 0; i < cartItems.length; i++) {
@@ -44,21 +40,12 @@ export const calculateCart = () => {
             totalPrice += itemTotalPrice * (1 - discount);
         })();
     }
-    const discountRate = calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice)
 
-    sum.textContent = '총액: ' + Math.round(totalPrice) + '원';
-    if (discountRate > 0) {
-        const span = document.createElement('span');
-        span.className = 'text-green-500 ml-2';
-        span.textContent = '(' + (discountRate * 100).toFixed(1) + '% 할인 적용)';
-        sum.appendChild(span);
-    }
-
-    return totalPrice
+    return { totalPrice, totalItemCount, subTotalPrice };
 };
 
 /** 장바구니의 상품들에 대한 총 할인율을 계산하여 반환합니다. */
-const calculateDiscountRate = (totalPrice, totalItemCount, subTotalPrice) => {
+export const calculateDiscountRate = (totalPrice, totalItemCount, subTotalPrice) => {
     let discountRate = 0;
 
     if (totalItemCount >= 30) {

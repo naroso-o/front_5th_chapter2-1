@@ -1,5 +1,5 @@
 import CartPage from './page/cart-page';
-import { calculateCart, updateBonusPoints } from './service/cart';
+import { calculateCart, calculateDiscountRate, updateBonusPoints } from './service/cart';
 import {
     updateLuckyItemSale,
     updateProductsPrice,
@@ -10,13 +10,26 @@ import {
 import { getProductById } from './utils/cart';
 
 function main() {
-    const root = document.getElementById('app');
-    root.innerHTML = CartPage();
+    const $root = document.getElementById('app');
+    $root.innerHTML = CartPage();
+
+    const $cartTotal = document.getElementById('cart-total');
 
     // 관련 모든 상태를 초기화합니다.
     updateLastSelectedItem();
     updateProductsPrice();
-    const totalPrice = calculateCart();
+
+    const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
+    const discountRate =  calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice)
+
+    $cartTotal.textContent = '총액: ' + Math.round(totalPrice) + '원';
+    if (discountRate > 0) {
+        const span = document.createElement('span');
+        span.className = 'text-green-500 ml-2';
+        span.textContent = '(' + (discountRate * 100).toFixed(1) + '% 할인 적용)';
+        $cartTotal.appendChild(span);
+    }
+
     updateBonusPoints(totalPrice)
     updateProductsStock()
 
@@ -33,23 +46,25 @@ function main() {
 
 main();
 
-const addItemButton = document.getElementById('add-to-cart');
-addItemButton.addEventListener('click', function () {
-    const productSelect = document.getElementById('product-select');
-    const cartContainer = document.getElementById('cart-items');
+const $addItemButton = document.getElementById('add-to-cart');
+const $cartContainer = document.getElementById('cart-items');
 
-    const selectedItemId = productSelect.value;
+$addItemButton.addEventListener('click', function () {
+    const $productSelect = document.getElementById('product-select');
+    const $cartTotal = document.getElementById('cart-total');
+
+    const selectedItemId = $productSelect.value;
     const itemToAdd = getProductById(selectedItemId)
 
     if (itemToAdd && !!itemToAdd.stock) {
-        const cartItem = document.getElementById(itemToAdd.id);
+        const $cartItem = document.getElementById(itemToAdd.id);
 
-        if (cartItem) {
-            const currentCount = cartItem.querySelector('span').textContent.split('x ')[1];
+        if ($cartItem) {
+            const currentCount = $cartItem.querySelector('span').textContent.split('x ')[1];
             const newCount = parseInt(currentCount) + 1;
 
             if (newCount <= itemToAdd.stock) {
-                cartItem.querySelector('span').textContent = `${itemToAdd.name} - ${itemToAdd.price} 원 x ${newCount}`;
+                $cartItem.querySelector('span').textContent = `${itemToAdd.name} - ${itemToAdd.price} 원 x ${newCount}`;
                 itemToAdd.stock--;
             } else {
                 alert('재고가 부족합니다.');
@@ -66,25 +81,35 @@ addItemButton.addEventListener('click', function () {
 
             newItem.innerHTML = `<div>${newItemInformation}${minusItemButton}${plusItemButton}${removeItemButton}</div>`;
 
-            cartContainer.appendChild(newItem);
+            $cartContainer.appendChild(newItem);
             itemToAdd.stock--;
         }
-        const totalPrice = calculateCart();
+        const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
+        const discountRate = calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice )
+
+        $cartTotal.textContent = '총액: ' + Math.round(totalPrice) + '원';
+        if (discountRate > 0) {
+            const span = document.createElement('span');
+            span.className = 'text-green-500 ml-2';
+            span.textContent = '(' + (discountRate * 100).toFixed(1) + '% 할인 적용)';
+            $cartTotal.appendChild(span);
+        }
+
         updateBonusPoints(totalPrice)
         updateProductsStock()
         updateLastSelectedItem(selectedItemId);
     }
 });
 
-const cartContainer = document.getElementById('cart-items');
-cartContainer.addEventListener('click', function (event) {
+$cartContainer.addEventListener('click', function (event) {
     const target = event.target;
     if (target.classList.contains('quantity-change') || target.classList.contains('remove-item')) {
         const productId = target.dataset.productId;
-        const itemElement = document.getElementById(productId);
+        const $itemElement = document.getElementById(productId);
+        const $cartTotal = document.getElementById('cart-total');
 
-        const currentItemName = itemElement.querySelector('span').textContent.split('x ')[0];
-        const currentItemCount = parseInt(itemElement.querySelector('span').textContent.split('x ')[1]);
+        const currentItemName = $itemElement.querySelector('span').textContent.split('x ')[0];
+        const currentItemCount = parseInt($itemElement.querySelector('span').textContent.split('x ')[1]);
 
         const prodduct = getProductById(productId)
 
@@ -93,10 +118,10 @@ cartContainer.addEventListener('click', function (event) {
             const newItemCount = currentItemCount + quantityChange;
 
             if (newItemCount > 0 && newItemCount <= prodduct.stock + currentItemCount) {
-                itemElement.querySelector('span').textContent = currentItemName + 'x ' + newItemCount;
+                $itemElement.querySelector('span').textContent = currentItemName + 'x ' + newItemCount;
                 prodduct.stock -= quantityChange;
             } else if (newItemCount <= 0) {
-                itemElement.remove();
+                $itemElement.remove();
                 prodduct.stock -= quantityChange;
             } else {
                 alert('재고가 부족합니다.');
@@ -105,9 +130,19 @@ cartContainer.addEventListener('click', function (event) {
             const removedQuantity = currentItemCount;
 
             prodduct.stock += removedQuantity;
-            itemElement.remove();
+            $itemElement.remove();
         }
-        const totalPrice = calculateCart();
+        const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
+        const discountRate = calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice)
+
+        $cartTotal.textContent = '총액: ' + Math.round(totalPrice) + '원';
+        if (discountRate > 0) {
+            const span = document.createElement('span');
+            span.className = 'text-green-500 ml-2';
+            span.textContent = '(' + (discountRate * 100).toFixed(1) + '% 할인 적용)';
+            $cartTotal.appendChild(span);
+        }
+
         updateBonusPoints(totalPrice)
         updateProductsStock()
     }
