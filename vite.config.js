@@ -6,4 +6,9 @@ export default defineConfig({
         environment: 'jsdom',
         setupFiles: 'src/setupTests.js',
     },
+    server: {
+        // open: '/index.html', 
+        // open: '/index.basic.html', 
+        open: '/index.advanced.html', 
+    },
 });
