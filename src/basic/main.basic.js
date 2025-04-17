@@ -1,4 +1,3 @@
-import MOCK_PRODUCT_LIST from './mock/product';
 import CartPage from './page/cart-page';
 import { calculateCart } from './service/cart';
 import {
@@ -7,6 +6,7 @@ import {
     updateLastSelectedSale,
     updateLastSelectedItem,
 } from './service/product';
+import { getProductById } from './utils/cart';
 
 function main() {
     const root = document.getElementById('app');
@@ -35,10 +35,8 @@ addItemButton.addEventListener('click', function () {
     const productSelect = document.getElementById('product-select');
     const cartContainer = document.getElementById('cart-items');
 
-    const selectedItem = productSelect.value;
-    const itemToAdd = MOCK_PRODUCT_LIST.find(function (product) {
-        return product.id === selectedItem;
-    });
+    const selectedItemId = productSelect.value;
+    const itemToAdd = getProductById(selectedItemId)
 
     if (itemToAdd && !!itemToAdd.stock) {
         const cartItem = document.getElementById(itemToAdd.id);
@@ -69,7 +67,7 @@ addItemButton.addEventListener('click', function () {
             itemToAdd.stock--;
         }
         calculateCart();
-        updateLastSelectedItem(selectedItem);
+        updateLastSelectedItem(selectedItemId);
     }
 });
 
@@ -79,28 +77,29 @@ cartContainer.addEventListener('click', function (event) {
     if (target.classList.contains('quantity-change') || target.classList.contains('remove-item')) {
         const productId = target.dataset.productId;
         const itemElement = document.getElementById(productId);
-        const prodduct = MOCK_PRODUCT_LIST.find(function (p) {
-            return p.id === productId;
-        });
+
+        const currentItemName = itemElement.querySelector('span').textContent.split('x ')[0];
+        const currentItemCount = parseInt(itemElement.querySelector('span').textContent.split('x ')[1]);
+
+        const prodduct = getProductById(productId)
+
         if (target.classList.contains('quantity-change')) {
-            const qtyChange = parseInt(target.dataset.change);
-            const newItemCount = parseInt(itemElement.querySelector('span').textContent.split('x ')[1]) + qtyChange;
-            if (
-                newItemCount > 0 &&
-                newItemCount <= prodduct.stock + parseInt(itemElement.querySelector('span').textContent.split('x ')[1])
-            ) {
-                itemElement.querySelector('span').textContent =
-                    itemElement.querySelector('span').textContent.split('x ')[0] + 'x ' + newItemCount;
-                prodduct.stock -= qtyChange;
+            const quantityChange = parseInt(target.dataset.change);
+            const newItemCount = currentItemCount + quantityChange;
+
+            if (newItemCount > 0 && newItemCount <= prodduct.stock + currentItemCount) {
+                itemElement.querySelector('span').textContent = currentItemName + 'x ' + newItemCount;
+                prodduct.stock -= quantityChange;
             } else if (newItemCount <= 0) {
                 itemElement.remove();
-                prodduct.stock -= qtyChange;
+                prodduct.stock -= quantityChange;
             } else {
                 alert('재고가 부족합니다.');
             }
         } else if (target.classList.contains('remove-item')) {
-            const remQty = parseInt(itemElement.querySelector('span').textContent.split('x ')[1]);
-            prodduct.stock += remQty;
+            const removedQuantity = currentItemCount;
+
+            prodduct.stock += removedQuantity;
             itemElement.remove();
         }
         calculateCart();
