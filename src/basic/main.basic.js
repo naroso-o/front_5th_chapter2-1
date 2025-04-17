@@ -1,10 +1,11 @@
 import CartPage from './page/cart-page';
-import { calculateCart } from './service/cart';
+import { calculateCart, updateBonusPoints } from './service/cart';
 import {
     updateLuckyItemSale,
     updateProductsPrice,
     updateLastSelectedSale,
     updateLastSelectedItem,
+    updateProductsStock,
 } from './service/product';
 import { getProductById } from './utils/cart';
 
@@ -15,7 +16,9 @@ function main() {
     // 관련 모든 상태를 초기화합니다.
     updateLastSelectedItem();
     updateProductsPrice();
-    calculateCart();
+    const totalPrice = calculateCart();
+    updateBonusPoints(totalPrice)
+    updateProductsStock()
 
     // 랜덤 럭키 상품 세일을 Interval로 등록합니다.
     setTimeout(function () {
@@ -66,7 +69,9 @@ addItemButton.addEventListener('click', function () {
             cartContainer.appendChild(newItem);
             itemToAdd.stock--;
         }
-        calculateCart();
+        const totalPrice = calculateCart();
+        updateBonusPoints(totalPrice)
+        updateProductsStock()
         updateLastSelectedItem(selectedItemId);
     }
 });
@@ -102,6 +107,8 @@ cartContainer.addEventListener('click', function (event) {
             prodduct.stock += removedQuantity;
             itemElement.remove();
         }
-        calculateCart();
+        const totalPrice = calculateCart();
+        updateBonusPoints(totalPrice)
+        updateProductsStock()
     }
 });

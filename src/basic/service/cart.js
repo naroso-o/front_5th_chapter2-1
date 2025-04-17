@@ -1,8 +1,7 @@
-import { updateProductsStock } from './product';
 import MOCK_PRODUCT_LIST from '../mock/product';
 
 /**
- * - 카트에 담긴 상품들의 총 가격을 화면에 반영합니다.
+ * - 장바구니에 담긴 상품들의 총 가격을 화면에 반영합니다.
  * - 총 가격에 대한 보너스 포인트 함수를 호출합니다.
  * */
 export const calculateCart = () => {
@@ -13,7 +12,7 @@ export const calculateCart = () => {
     let totalItemCount = 0;
 
     const cartItems = cartContainer.children;
-    let subTot = 0;
+    let subTotalPrice = 0;
 
     for (let i = 0; i < cartItems.length; i++) {
         (function () {
@@ -26,42 +25,27 @@ export const calculateCart = () => {
             }
             const itemQuantity = parseInt(cartItems[i].querySelector('span').textContent.split('x ')[1]);
             const itemTotalPrice = currentItem.price * itemQuantity;
-            let disc = 0;
+            let discount = 0;
             totalItemCount += itemQuantity;
-            subTot += itemTotalPrice;
+            subTotalPrice += itemTotalPrice;
             if (itemQuantity >= 10) {
                 if (currentItem.id === 'p1') {
-                    disc = 0.1;
+                    discount = 0.1;
                 } else if (currentItem.id === 'p2') {
-                    disc = 0.15;
+                    discount = 0.15;
                 } else if (currentItem.id === 'p3') {
-                    disc = 0.2;
+                    discount = 0.2;
                 } else if (currentItem.id === 'p4') {
-                    disc = 0.05;
+                    discount = 0.05;
                 } else if (currentItem.id === 'p5') {
-                    disc = 0.25;
+                    discount = 0.25;
                 }
             }
-            totalPrice += itemTotalPrice * (1 - disc);
+            totalPrice += itemTotalPrice * (1 - discount);
         })();
     }
-    let discountRate = 0;
-    if (totalItemCount >= 30) {
-        const bulkDisc = totalPrice * 0.25;
-        const itemDisc = subTot - totalPrice;
-        if (bulkDisc > itemDisc) {
-            totalPrice = subTot * (1 - 0.25);
-            discountRate = 0.25;
-        } else {
-            discountRate = (subTot - totalPrice) / subTot;
-        }
-    } else {
-        discountRate = (subTot - totalPrice) / subTot;
-    }
-    if (new Date().getDay() === 2) {
-        totalPrice *= 1 - 0.1;
-        discountRate = Math.max(discountRate, 0.1);
-    }
+    const discountRate = calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice)
+
     sum.textContent = '총액: ' + Math.round(totalPrice) + '원';
     if (discountRate > 0) {
         const span = document.createElement('span');
@@ -69,8 +53,32 @@ export const calculateCart = () => {
         span.textContent = '(' + (discountRate * 100).toFixed(1) + '% 할인 적용)';
         sum.appendChild(span);
     }
-    updateProductsStock();
-    updateBonusPoints(totalPrice);
+
+    return totalPrice
+};
+
+/** 장바구니의 상품들에 대한 총 할인율을 계산하여 반환합니다. */
+const calculateDiscountRate = (totalPrice, totalItemCount, subTotalPrice) => {
+    let discountRate = 0;
+
+    if (totalItemCount >= 30) {
+        const bulkDiscount = totalPrice * 0.25;
+        const itemDisccount = subTotalPrice - totalPrice;
+        if (bulkDiscount > itemDisccount) {
+            totalPrice = subTotalPrice * (1 - 0.25);
+            discountRate = 0.25;
+        } else {
+            discountRate = (subTotalPrice - totalPrice) / subTotalPrice;
+        }
+    } else {
+        discountRate = (subTotalPrice - totalPrice) / subTotalPrice;
+    }
+    if (new Date().getDay() === 2) {
+        totalPrice *= 1 - 0.1;
+        discountRate = Math.max(discountRate, 0.1);
+    }
+
+    return discountRate;
 };
 
 /** totalPrice에 대한 보너스 포인트를 계산하고 화면에 반영합니다. */
