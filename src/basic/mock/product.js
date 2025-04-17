@@ -4,6 +4,6 @@ const MOCK_PRODUCT_LIST = [
     { id: 'p3', name: '상품3', price: 30000, stock: 20 },
     { id: 'p4', name: '상품4', price: 15000, stock: 0 },
     { id: 'p5', name: '상품5', price: 25000, stock: 10 },
-]
+];
 
-export default MOCK_PRODUCT_LIST
+export default MOCK_PRODUCT_LIST;
