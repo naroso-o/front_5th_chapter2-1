@@ -1,5 +1,5 @@
 import CartPage from './page/cart-page';
-import { calculateCart, calculateDiscountRate, updateBonusPoints } from './service/cart';
+import { calculateCart, calculateDiscountRate } from './service/cart';
 import {
     updateLuckyItemSale,
     updateProductsPrice,
@@ -8,12 +8,11 @@ import {
     updateProductsStock,
 } from './service/product';
 import { getProductById } from './utils/cart';
+import { updateTotalPriceAndPoints } from './utils/render';
 
 function main() {
     const $root = document.getElementById('app');
     $root.innerHTML = CartPage();
-
-    const $cartTotal = document.getElementById('cart-total');
 
     // 관련 모든 상태를 초기화합니다.
     updateLastSelectedItem();
@@ -22,15 +21,7 @@ function main() {
     const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
     const discountRate =  calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice)
 
-    $cartTotal.textContent = '총액: ' + Math.round(totalPrice) + '원';
-    if (discountRate > 0) {
-        const span = document.createElement('span');
-        span.className = 'text-green-500 ml-2';
-        span.textContent = '(' + (discountRate * 100).toFixed(1) + '% 할인 적용)';
-        $cartTotal.appendChild(span);
-    }
-
-    updateBonusPoints(totalPrice)
+    updateTotalPriceAndPoints(totalPrice, discountRate)
     updateProductsStock()
 
     // 랜덤 럭키 상품 세일을 Interval로 등록합니다.
@@ -51,7 +42,6 @@ const $cartContainer = document.getElementById('cart-items');
 
 $addItemButton.addEventListener('click', function () {
     const $productSelect = document.getElementById('product-select');
-    const $cartTotal = document.getElementById('cart-total');
 
     const selectedItemId = $productSelect.value;
     const itemToAdd = getProductById(selectedItemId)
@@ -87,15 +77,7 @@ $addItemButton.addEventListener('click', function () {
         const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
         const discountRate = calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice )
 
-        $cartTotal.textContent = '총액: ' + Math.round(totalPrice) + '원';
-        if (discountRate > 0) {
-            const span = document.createElement('span');
-            span.className = 'text-green-500 ml-2';
-            span.textContent = '(' + (discountRate * 100).toFixed(1) + '% 할인 적용)';
-            $cartTotal.appendChild(span);
-        }
-
-        updateBonusPoints(totalPrice)
+        updateTotalPriceAndPoints(totalPrice, discountRate)
         updateProductsStock()
         updateLastSelectedItem(selectedItemId);
     }
@@ -106,7 +88,6 @@ $cartContainer.addEventListener('click', function (event) {
     if (target.classList.contains('quantity-change') || target.classList.contains('remove-item')) {
         const productId = target.dataset.productId;
         const $itemElement = document.getElementById(productId);
-        const $cartTotal = document.getElementById('cart-total');
 
         const currentItemName = $itemElement.querySelector('span').textContent.split('x ')[0];
         const currentItemCount = parseInt($itemElement.querySelector('span').textContent.split('x ')[1]);
@@ -135,15 +116,7 @@ $cartContainer.addEventListener('click', function (event) {
         const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
         const discountRate = calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice)
 
-        $cartTotal.textContent = '총액: ' + Math.round(totalPrice) + '원';
-        if (discountRate > 0) {
-            const span = document.createElement('span');
-            span.className = 'text-green-500 ml-2';
-            span.textContent = '(' + (discountRate * 100).toFixed(1) + '% 할인 적용)';
-            $cartTotal.appendChild(span);
-        }
-
-        updateBonusPoints(totalPrice)
+        updateTotalPriceAndPoints(totalPrice, discountRate)
         updateProductsStock()
     }
 });

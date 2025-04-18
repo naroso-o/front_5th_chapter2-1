@@ -67,19 +67,3 @@ export const calculateDiscountRate = (totalPrice, totalItemCount, subTotalPrice)
 
     return discountRate;
 };
-
-/** totalPrice에 대한 보너스 포인트를 계산하고 화면에 반영합니다. */
-export const updateBonusPoints = (totalPrice) => {
-    const sum = document.getElementById('cart-total');
-    let ptsTag = document.getElementById('loyalty-points');
-
-    const bonusPoints = Math.floor(totalPrice / 1000) || 0;
-
-    if (!ptsTag) {
-        ptsTag = document.createElement('span');
-        ptsTag.id = 'loyalty-points';
-        ptsTag.className = 'text-blue-500 ml-2';
-        sum.appendChild(ptsTag);
-    }
-    ptsTag.textContent = '(포인트: ' + bonusPoints + ')';
-};
