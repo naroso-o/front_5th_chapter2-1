@@ -3,9 +3,9 @@ import { getDiscountPercentage } from '../utils/cart';
 let lastSelectedItem;
 
 /** 전체 상품 가격을 업데이트하여 화면에 반영합니다. */
-export const updateProductsPrice = () => {
-    const select = document.getElementById('product-select');
-    select.innerHTML = '';
+export const renderProductPrice = () => {
+    const $select = document.getElementById('product-select');
+    $select.innerHTML = '';
     MOCK_PRODUCT_LIST.forEach(function (item) {
         const option = document.createElement('option');
         option.value = item.id;
@@ -13,7 +13,7 @@ export const updateProductsPrice = () => {
         if (item.stock === 0) {
             option.disabled = true;
         }
-        select.appendChild(option);
+        $select.appendChild(option);
     });
 };
 
@@ -26,7 +26,7 @@ export const updateLuckyItemSale = () => {
     if (Math.random() < LUCKY_APPEARANCE_RATE && luckyItem.stock > 0) {
         luckyItem.price = Math.round(luckyItem.price * LUCKY_DISCOUNT_RATE);
         alert(`번개세일! ${luckyItem.name}'이(가) ${discountPercentageText}% 할인 중입니다!`);
-        updateProductsPrice();
+        renderProductPrice();
     }
 };
 
@@ -41,7 +41,7 @@ export const updateLastSelectedSale = () => {
         if (suggest) {
             alert(suggest.name + `은(는) 어떠세요? 지금 구매하시면 ${discountPercentageText}% 추가 할인!`);
             suggest.price = Math.round(suggest.vpriceal * LAST_SELECTED_DISCOUNT_RATE);
-            updateProductsPrice();
+            renderProductPrice();
         }
     }
 };

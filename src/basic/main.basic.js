@@ -2,7 +2,7 @@ import CartPage from './page/cart-page';
 import { calculateCart, calculateDiscountRate } from './service/cart';
 import {
     updateLuckyItemSale,
-    updateProductsPrice,
+    renderProductPrice,
     updateLastSelectedSale,
     updateLastSelectedItem,
 } from './service/product';
@@ -15,7 +15,7 @@ function main() {
 
     // 관련 모든 상태를 초기화합니다.
     updateLastSelectedItem();
-    updateProductsPrice();
+    renderProductPrice();
 
     const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
     const discountRate =  calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice)
