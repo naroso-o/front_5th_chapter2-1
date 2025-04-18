@@ -5,10 +5,9 @@ import {
     updateProductsPrice,
     updateLastSelectedSale,
     updateLastSelectedItem,
-    updateProductsStock,
 } from './service/product';
 import { getProductById } from './utils/cart';
-import { updateTotalPriceAndPoints } from './utils/render';
+import { renderCartSection, renderProductSection } from './utils/render';
 
 function main() {
     const $root = document.getElementById('app');
@@ -21,8 +20,8 @@ function main() {
     const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
     const discountRate =  calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice)
 
-    updateTotalPriceAndPoints(totalPrice, discountRate)
-    updateProductsStock()
+    renderCartSection(totalPrice, discountRate)
+    renderProductSection()
 
     // 랜덤 럭키 상품 세일을 Interval로 등록합니다.
     setTimeout(function () {
@@ -77,8 +76,8 @@ $addItemButton.addEventListener('click', function () {
         const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
         const discountRate = calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice )
 
-        updateTotalPriceAndPoints(totalPrice, discountRate)
-        updateProductsStock()
+        renderCartSection(totalPrice, discountRate)
+        renderProductSection()
         updateLastSelectedItem(selectedItemId);
     }
 });
@@ -116,7 +115,7 @@ $cartContainer.addEventListener('click', function (event) {
         const { totalPrice, totalItemCount, subTotalPrice } = calculateCart();
         const discountRate = calculateDiscountRate(totalPrice, totalItemCount, subTotalPrice)
 
-        updateTotalPriceAndPoints(totalPrice, discountRate)
-        updateProductsStock()
+        renderCartSection(totalPrice, discountRate)
+        renderProductSection()
     }
 });

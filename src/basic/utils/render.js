@@ -1,4 +1,6 @@
-export const updateTotalPriceAndPoints = (totalPrice, discountRate) => {
+import MOCK_PRODUCT_LIST from "../mock/product";
+
+export const renderCartSection = (totalPrice, discountRate) => {
     const $cartTotal = document.getElementById('cart-total');
 
     // totalPrice를 화면에 반영합니다.
@@ -22,3 +24,16 @@ export const updateTotalPriceAndPoints = (totalPrice, discountRate) => {
     }
     $pointTag.textContent = '(포인트: ' + bonusPoints + ')';
 }
+
+const REMAIN_NOTIFY_COUNT = 5
+/** 전체 상품 재고를 업데이트하여 화면에 반영합니다. */
+export const renderProductSection = () => {
+    const stockInfo = document.getElementById('stock-status');
+    let infoMsg = '';
+    MOCK_PRODUCT_LIST.forEach(function (item) {
+        if (item.stock < REMAIN_NOTIFY_COUNT) {
+            infoMsg += item.name + ': ' + (item.stock > 0 ? '재고 부족 (' + item.stock + '개 남음)' : '품절') + '\n';
+        }
+    });
+    stockInfo.textContent = infoMsg;
+};

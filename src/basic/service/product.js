@@ -17,19 +17,6 @@ export const updateProductsPrice = () => {
     });
 };
 
-const REMAIN_NOTIFY_COUNT = 5
-/** 전체 상품 재고를 업데이트하여 화면에 반영합니다. */
-export const updateProductsStock = () => {
-    const stockInfo = document.getElementById('stock-status');
-    let infoMsg = '';
-    MOCK_PRODUCT_LIST.forEach(function (item) {
-        if (item.stock < REMAIN_NOTIFY_COUNT) {
-            infoMsg += item.name + ': ' + (item.stock > 0 ? '재고 부족 (' + item.stock + '개 남음)' : '품절') + '\n';
-        }
-    });
-    stockInfo.textContent = infoMsg;
-};
-
 const LUCKY_APPEARANCE_RATE = 0.3;
 const LUCKY_DISCOUNT_RATE = 0.8;
 /** 랜덤 럭키 상품을 선정하여 세일합니다. */
